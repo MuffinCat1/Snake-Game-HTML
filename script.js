@@ -4,10 +4,27 @@ var scl = 20;
 var food;
 var score = 0;
 
-var FirstGame = false;
+var a = 255;
+var b = 0;
+var c = 0;
+
+var FirstGame = true;
+var changeColor = false;
 
 if (performance.navigation.type == performance.navigation.TYPE_RELOAD)
-    FirstGame = true;
+    FirstGame = false;
+
+function generateRandomColor() {
+
+    var letters = '0123456789ABCDEF';
+    var color = '#';
+
+    for (var i = 0; i < 6; i++) {
+        color += letters[Math.floor(Math.random() * 16)];
+    }
+
+    return color;
+}
 
 function setup() {
 
@@ -20,7 +37,7 @@ function setup() {
 
     if (typeof (Storage) !== "undefined") {
 
-        if (!FirstGame)
+        if (FirstGame)
             sessionStorage.setItem(Math.random().toString(36).substring(2), "You Started A New Game At: " + Date());
 
         else
@@ -72,6 +89,9 @@ function keyPressed() {
     if (key === 'u') {
         window.localStorage.clear();
     }
+
+    if (key === 'v')
+        changeColor = true;
 }
 
 function Snake() {
@@ -142,7 +162,18 @@ function Snake() {
 
         this.show = function () {
 
-            fill(255);
+            var randomColor = generateRandomColor();
+
+            fill(a, b, c);
+
+            if (changeColor) {
+
+                a = random(300);
+                b = random(300);
+                c = random(300);
+
+                document.body.style.background = randomColor;
+            }
 
             for (var i = 0; i < this.tail.length; i++)
                 rect(this.tail[i].x, this.tail[i].y, scl, scl);
