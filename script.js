@@ -1,0 +1,152 @@
+var s;
+var scl = 20;
+
+var food;
+var score = 0;
+
+var FirstGame = false;
+
+if (performance.navigation.type == performance.navigation.TYPE_RELOAD)
+    FirstGame = true;
+
+function setup() {
+
+    createCanvas(600, 600, P2D);
+
+    s = new Snake();
+    frameRate(10);
+
+    pickLocation();
+
+    if (typeof (Storage) !== "undefined") {
+
+        if (!FirstGame)
+            sessionStorage.setItem(Math.random().toString(36).substring(2), "You Started A New Game At: " + Date());
+
+        else
+            sessionStorage.setItem(Math.random().toString(36).substring(2), "You Started Another Game At: " + Date());
+    }
+}
+
+function pickLocation() {
+
+    var cols = floor(width / scl);
+    var rows = floor(height / scl);
+
+    food = createVector(floor(random(cols)), floor(random(rows)));
+
+    food.mult(scl);
+}
+
+function draw() {
+
+    background(51);
+
+    s.death();
+    s.update();
+    s.show();
+
+    if (s.eat(food))
+        pickLocation();
+
+    document.getElementById("score").innerHTML = "Score: " + score;
+
+    fill(255, 0, 100)
+    rect(food.x, food.y, scl, scl);
+}
+
+function keyPressed() {
+
+    if (keyCode === UP_ARROW || key === 'w')
+        s.dir(0, -1);
+
+    else if (keyCode === DOWN_ARROW || key === 's')
+        s.dir(0, 1);
+
+    else if (keyCode === RIGHT_ARROW || key === 'd')
+        s.dir(1, 0);
+
+    else if (keyCode === LEFT_ARROW || key === 'a')
+        s.dir(-1, 0);
+
+    if (key === 'u') {
+        window.localStorage.clear();
+    }
+}
+
+function Snake() {
+
+    this.x = 0;
+    this.y = 0;
+
+    this.xSpeed = 1;
+    this.ySpeed = 0;
+
+    this.total = 0;
+    this.tail = [];
+
+    this.death = function () {
+
+        for (var i = 0; i < this.tail.length; i++) {
+
+            var pos = this.tail[i];
+            var d = dist(this.x, this.y, pos.x, pos.y);
+
+            if (d < 1) {
+
+                if (typeof (Storage) !== "undefined")
+                    localStorage.setItem(Math.random().toString(36).substring(2), "Score: " + score);
+
+                    location.reload();
+                }
+            }
+        }
+
+        this.eat = function (pos) {
+
+            var d = dist(this.x, this.y, pos.x, pos.y)
+
+            if (d < 1) {
+
+                this.total++;
+                score++;
+                return true;
+            }
+
+            else
+                return false;
+        }
+
+        this.dir = function (x, y) {
+
+            this.xSpeed = x;
+            this.ySpeed = y;
+        }
+
+        this.update = function () {
+
+            if (this.total === this.tail.length) {
+
+                for (var i = 0; i < this.tail.length - 1; i++)
+                    this.tail[i] = this.tail[i + 1];
+            }
+
+            this.tail[this.total - 1] = createVector(this.x, this.y);
+
+            this.x = this.x + this.xSpeed * scl;
+            this.y = this.y + this.ySpeed * scl;
+
+            this.x = constrain(this.x, 0, width - scl);
+            this.y = constrain(this.y, 0, height - scl);
+        }
+
+        this.show = function () {
+
+            fill(255);
+
+            for (var i = 0; i < this.tail.length; i++)
+                rect(this.tail[i].x, this.tail[i].y, scl, scl);
+
+            rect(this.x, this.y, scl, scl);
+        }
+    }
