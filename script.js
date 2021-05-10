@@ -26,6 +26,18 @@ function generateRandomColor() {
     return color;
 }
 
+function generateRandomColor2() {
+
+    var letters = '0123456789ABCDEGF';
+    var color = '#';
+
+    for (var i = 0; i < 6; i++) {
+        color += letters[Math.floor(Math.random() * 16)];
+    }
+
+    return color;
+}
+
 function setup() {
 
     createCanvas(600, 600, P2D);
@@ -59,6 +71,9 @@ function draw() {
 
     background(51);
 
+    if (changeColor)
+        background(a * 2, b * 2, c * 2);
+
     s.death();
     s.update();
     s.show();
@@ -69,6 +84,10 @@ function draw() {
     document.getElementById("score").innerHTML = "Score: " + score;
 
     fill(255, 0, 100)
+
+    if (changeColor)
+        fill(a / 2, b / 2, c / 2);
+
     rect(food.x, food.y, scl, scl);
 }
 
@@ -92,6 +111,9 @@ function keyPressed() {
 
     if (key === 'v')
         changeColor = true;
+
+    if (key === 'b' && changeColor)
+        changeColor = false;
 }
 
 function Snake() {
@@ -163,8 +185,9 @@ function Snake() {
         this.show = function () {
 
             var randomColor = generateRandomColor();
+            var randomColor2 = generateRandomColor2();
 
-            fill(a, b, c);
+            fill(255);
 
             if (changeColor) {
 
@@ -172,7 +195,21 @@ function Snake() {
                 b = random(300);
                 c = random(300);
 
+                fill(a, b, c);
+
                 document.body.style.background = randomColor;
+
+                var h1Elements = document.getElementsByTagName("h1");
+
+                for (var i = 0; i < h1Elements.length; i++) {
+                    h1Elements[i].style.color = randomColor2;
+                }
+
+                var pElements = document.getElementsByTagName("p");
+
+                for (var i = 0; i < pElements.length; i++) {
+                    pElements[i].style.color = randomColor2;
+                }
             }
 
             for (var i = 0; i < this.tail.length; i++)
